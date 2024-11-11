@@ -7,6 +7,15 @@ document
 
 let jsonData = {};
 
+// Load data from localStorage if available
+window.addEventListener("load", () => {
+  const savedData = localStorage.getItem("jsonData");
+  if (savedData) {
+    jsonData = JSON.parse(savedData);
+    displayJSON(jsonData);
+  }
+});
+
 function handleFileUpload(event) {
   const file = event.target.files[0];
   if (file && file.type === "application/json") {
@@ -14,14 +23,15 @@ function handleFileUpload(event) {
     reader.onload = (e) => {
       try {
         jsonData = JSON.parse(e.target.result);
+        saveToLocalStorage();
         displayJSON(jsonData);
       } catch (error) {
-        alert("please upload a valid JSON file");
+        alert("Please upload a valid JSON file.");
       }
     };
     reader.readAsText(file);
   } else {
-    alert("please upload a valid JSON file");
+    alert("Please upload a valid JSON file.");
   }
 }
 
@@ -48,10 +58,9 @@ function displayNestedObject(data, container) {
     row.appendChild(keyLabel);
 
     if (typeof value === "object" && value !== null) {
-      // İç içe geçmiş nesneler için yeni bir container oluştur
       const nestedContainer = document.createElement("div");
       nestedContainer.className = "ml-4 border-l-2 pl-4 border-gray-300";
-      displayNestedObject(value, nestedContainer); // Recursive çağrı
+      displayNestedObject(value, nestedContainer);
       row.appendChild(nestedContainer);
     } else {
       const inputField = document.createElement("input");
@@ -60,13 +69,17 @@ function displayNestedObject(data, container) {
       inputField.value = value;
       inputField.addEventListener("input", (e) => {
         data[key] = e.target.value;
-        inputField.classList.add("bg-yellow-100"); // Add class to highlight changed fields
+        inputField.classList.add("bg-yellow-100");
+        saveToLocalStorage();
       });
       row.appendChild(inputField);
     }
-
     container.appendChild(row);
   });
+}
+
+function saveToLocalStorage() {
+  localStorage.setItem("jsonData", JSON.stringify(jsonData));
 }
 
 function downloadUpdatedJSON() {
