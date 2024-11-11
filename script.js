@@ -60,6 +60,7 @@ function displayNestedObject(data, container) {
       inputField.value = value;
       inputField.addEventListener("input", (e) => {
         data[key] = e.target.value;
+        inputField.classList.add("bg-yellow-100"); // Add class to highlight changed fields
       });
       row.appendChild(inputField);
     }
